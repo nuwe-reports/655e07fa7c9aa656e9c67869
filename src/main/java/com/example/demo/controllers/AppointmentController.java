@@ -6,6 +6,7 @@ import com.example.demo.entities.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,13 +52,28 @@ public class AppointmentController {
     }
 
     @PostMapping("/appointment")
-    public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment){
+    public ResponseEntity<List<Appointment>> createAppointment(@RequestBody Appointment appointment) {
         /** TODO 
          * Implement this function, which acts as the POST /api/appointment endpoint.
          * Make sure to check out the whole project. Specially the Appointment.java class
          */
-        return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+        if (appointment.getStartsAt().equals(appointment.getFinishesAt())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            List<Appointment> appointmentList = appointmentRepository.findAll();
+            List<Appointment> overlapsAppointments = appointmentList.stream().filter(x -> x.overlaps(appointment)).collect(Collectors.toList());
+            if (!overlapsAppointments.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+            } else {
+                appointmentRepository.save(appointment);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
     }
+
+
+
+
 
 
     @DeleteMapping("/appointments/{id}")
