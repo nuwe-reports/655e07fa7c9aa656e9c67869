@@ -1,0 +1,7 @@
+FROM mysql:5.7
+MAINTAINER lenin manrique
+
+ENV MYSQL_DATABASE=accwe-hospital \
+    MYSQL_ROOT_PASSWORD=root
+
+EXPOSE 3306
